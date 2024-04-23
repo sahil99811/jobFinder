@@ -40,9 +40,10 @@ exports.login = async (req, res) => {
         success: true,
         token,
         message: 'Login successful',
+        name:user.name
       });
     } else {
-      return respondWithError(res, 401, 'Incorrect password.');
+      return respondWithError(res, 401, 'Invalid credential..');
     }
   } catch (error) {
     console.error('Login error:', error);
@@ -52,13 +53,18 @@ exports.login = async (req, res) => {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, email, mobileNumber, password } = req.body;
-
+    const { name, email, mobileNo, password } = req.body;
+    
     // Check if user with the same email already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return respondWithError(res, 400, 'User already exists. Please sign in.');
+      // return respondWithError(res, 400, 'User already exists. Please sign in.');
+      return res.status(401).json({
+        success: false,
+        message:"user already exist",
+      });
+
     }
 
     // Hash the password
@@ -68,7 +74,7 @@ exports.signup = async (req, res) => {
     await User.create({
       name,
       email,
-      mobileNumber,
+      mobileNo,
       password: hashedPassword,
     });
     return res.status(200).json({

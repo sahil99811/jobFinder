@@ -40,18 +40,20 @@ exports.getJobs = async (req, res) => {
 
        // Add jobPosition to the query if search is provided
        if (search !== undefined) {
-        query.jobPosition = search;
-      }
+        query.jobPosition = {$regex:search,$options:"i"};
+       }
 
-      // Add skills to the query with $all operator
-      if (skills !== undefined) {
-        query.skills = { $all: skills.split(',') }; // Split skills string into an array
-      }
+       // Add skills to the query with $all operator
+       if (skills !== undefined) {
+        const caseInsensitiveSkills=skills.split(',').map((value)=>{
+            return new RegExp(value, "i")
+        })
+        query.skills = { $all: caseInsensitiveSkills }; 
+       }
 
         // Fetch jobs based on the query
         const jobs = await Job.find(query);
-
-        console.log(jobs);
+        
         res.status(200).json({
             success: true,
             jobs: jobs // Optionally send the jobs data in the response
