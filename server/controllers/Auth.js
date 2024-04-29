@@ -38,8 +38,8 @@ exports.login = async (req, res) => {
       const options = {
         expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         // httpOnly: true,
-        domain: 'vercel.app',
-        path:'/'
+        // domain: '.vercel.app',
+        // path:'/'
       };  
       console.log(user._id);   
       return res.cookie("token",token,options).status(200).json({
