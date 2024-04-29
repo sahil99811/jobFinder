@@ -41,7 +41,7 @@ const onChangeHandler = (event) => {
 // Function to fetch jobs based on search query
 const fetchJobs = async () => {
   const data = await getJobs(search,skills);
-  dispatch(setJobs(data.jobs));
+  dispatch(setJobs(data?.jobs));
 
 };
 

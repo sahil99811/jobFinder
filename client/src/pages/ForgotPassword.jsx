@@ -7,9 +7,9 @@ export default function ForgotPassword(){
     const [email, setEmail] = useState("")
     const navigate=useNavigate();
     const [emailSent, setEmailSent] = useState(false)
-    const handleOnSubmit = (e) => {
+    const handleOnSubmit = async (e) => {
         e.preventDefault()
-        resetPasswordToken(email,setEmailSent,navigate);
+        await resetPasswordToken(email,setEmailSent,navigate);
       }
     return(
         <div className="max-w-[500px] p-4 lg:p-8 flex flex-col mx-auto mt-6">

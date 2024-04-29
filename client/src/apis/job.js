@@ -53,7 +53,7 @@ export const getJobDetails=async (jobid)=>{
          axios.defaults.withCredentials = true;
 
         const result=await axios.get(url,{ withCredentials: true });
-        return result.data;
+        return result?.data;
     }catch(error){
        console.log(error);
     }
@@ -72,7 +72,7 @@ export const getJobs=async (search,skills)=>{
             url=url+`?skills=${values}`
         }
         const ans=await axios.get(url);
-        return ans.data;
+        return ans?.data;
     }catch(error){
        console.log(error);
     }
