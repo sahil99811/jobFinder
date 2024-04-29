@@ -20,7 +20,7 @@ exports.createJob=async (req,res)=>{
             locationType,
             skills,
             jobType,
-            aboutCompany,
+            aboutCompany
         } = req.body;
         const {logo}=req.files;
         if (

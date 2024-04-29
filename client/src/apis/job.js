@@ -20,7 +20,8 @@ export const createJob=async ({companyName,jobPosition,salary,location,jobDescri
     
     const response=await axios.post(url, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
       },
       withCredentials: true,
       validateStatus: function (status) {

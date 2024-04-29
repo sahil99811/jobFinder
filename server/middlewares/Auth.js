@@ -3,9 +3,9 @@ const jwt=require('jsonwebtoken');
 exports.auth = async (req, res, next) => {
 	try {
 			
-        // const token=req.header("Authorization").replace("Bearer ", "");
+        const token=req.header("Authorization").replace("Bearer ", "")||req.cookies.token;
 		// If JWT is missing, return 401 Unauthorized response
-		const token=req.cookies.token
+
 		if (!token) {
 			return res.status(401).json({ success: false, message: `Token Missing` });
 		}
