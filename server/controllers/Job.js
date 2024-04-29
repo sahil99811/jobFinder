@@ -1,4 +1,6 @@
 const Job=require('../models/Job');
+const mongoose=require('mongoose');
+const { uploadImageToCloudinary } = require('../utils/imageUploader');
 const respondWithError = (res, statusCode, message) => {
     res.status(statusCode).json({
       success: false,
@@ -8,52 +10,79 @@ const respondWithError = (res, statusCode, message) => {
 
 exports.createJob=async (req,res)=>{
     try{
-        const {companyName,logoUrl,jobPosition,jobType,mode,location,jobDescription,aboutCompany,skills,additionalInformation,salary}=req.body;
-        const userId=req.user.id;
-        const job=await Job.create({
-            companyName:companyName,
-            logoUrl:logoUrl,
-            jobPosition:jobPosition,
-            jobType:jobType,
-            mode:mode,
-            location:location,
-            jobDescription:jobDescription,
-            aboutCompany:aboutCompany,
-            skills:skills,
-            additionalInformation:additionalInformation,
-            salary:salary,
-            jobPoster:userId
-        }) 
+        const userId = req.user.id;
+        const {
+            companyName,
+            jobPosition,
+            jobDescription,
+            salary,
+            location,
+            locationType,
+            skills,
+            jobType,
+            aboutCompany,
+        } = req.body;
+        const {logo}=req.files;
+        if (
+            !companyName ||
+            !logo ||
+            !jobPosition ||
+            !jobDescription ||
+            !salary ||
+            !location ||
+            !locationType ||
+            !skills ||
+            !jobType ||
+            !aboutCompany
+        ) {
+            return res.status(400).json({
+                success:false,
+                message: "all field required",
+            });
+        }
+        const cloudinaryImage=await uploadImageToCloudinary(logo);
+        await Job.create({
+            companyName,
+            logoUrl:cloudinaryImage.secure_url,
+            title:jobPosition ,
+            description:jobDescription,
+            salary,
+            location,
+            locationType,
+            skills:JSON.parse(skills),
+            jobType,
+            aboutCompany,
+            refUserId:new mongoose.Types.ObjectId(userId)
+         });
         return res.status(201).json({
             success:true,
-            data:job
+            message:"job created successfully"
         })
     }catch(error){
         console.error("error while creating a job",error);
         respondWithError(res, 500, 'something went wrong. Please try again.');
     }
 }
-exports.getJobs = async (req, res) => {
+const fetchJobs = async (req, res, query) => {
     try {
         const { search, skills } = req.query;
-        const query = {};
+        console.log("priting in getjobdetails",req.cookies.token);
+        // Add jobPosition to the query if search is provided
+        if (search !== undefined) {
+            query.jobPosition = { $regex: search, $options: "i" };
+        }
 
-       // Add jobPosition to the query if search is provided
-       if (search !== undefined) {
-        query.jobPosition = {$regex:search,$options:"i"};
-       }
-
-       // Add skills to the query with $all operator
-       if (skills !== undefined) {
-        const caseInsensitiveSkills=skills.split(',').map((value)=>{
-            return new RegExp(value, "i")
-        })
-        query.skills = { $all: caseInsensitiveSkills }; 
-       }
-
-        // Fetch jobs based on the query
-        const jobs = await Job.find(query);
+        // Add skills to the query with $all operator
+        if (skills !== undefined) {
+            const caseInsensitiveSkills = skills.split(',').map((value) => {
+                return new RegExp(value, "i")
+            });
+            query.skills = { $all: caseInsensitiveSkills };
+        }
         
+        // Fetch jobs based on the query
+        const jobs = await Job.find(query,{companyName:1,title:1,salary:1,location:1,locationType:1,jobType:1,skills:1,logoUrl:1});
+
         res.status(200).json({
             success: true,
             jobs: jobs // Optionally send the jobs data in the response
@@ -64,18 +93,32 @@ exports.getJobs = async (req, res) => {
     }
 }
 
+exports.getJobs = async (req, res) => {
+    const query = {};
+    await fetchJobs(req, res, query);
+}
+
+exports.getJobPosterJobs = async (req, res) => {
+    const { id } = req.user;
+    const userId = new mongoose.Types.ObjectId(id);
+    const query = { jobPoster: userId };
+    await fetchJobs(req, res, query);
+}
 
 
 
 exports.getJobDetails=async (req,res)=>{
     try{
-        const {jobId}=req.params;
+        const {jobId,userId}=req.params;
+        console.log("priting in getjobdetails",req.cookies.token)
         const jobDetails=await Job.findById({_id:jobId});
         if(!jobDetails){
             respondWithError(res, 401, 'Invalid jobId');
         }
+        const isJobPoster=userId===jobDetails.refUserId.toString();
         return res.status(200).json({
             success:true,
+            jobPoster:isJobPoster,
             data:jobDetails
         })
     }catch(err){
