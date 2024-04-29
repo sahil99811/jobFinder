@@ -25,7 +25,7 @@ export const createJob=async ({companyName,jobPosition,salary,location,jobDescri
       },
       withCredentials: true,
       validateStatus: function (status) {
-        return status === 400 || status === 201;
+        return status === 400 || status === 201||status===401||status===402||status===403;
       }
     })
     if(response?.status===201){
@@ -35,6 +35,7 @@ export const createJob=async ({companyName,jobPosition,salary,location,jobDescri
     }
     }catch(error){
        console.log(error);
+       toast.error("Server Error try after sometime");
     }
 }
 

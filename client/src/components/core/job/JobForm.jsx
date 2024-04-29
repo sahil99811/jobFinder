@@ -33,7 +33,7 @@ export default function JobForm() {
   const onChangeHandler=(event)=>{
       setjobDataForm({...jobDataForm,[event.target.name]:event.target.value})
   }
-  const onSubmitHandler=(event)=>{
+  const onSubmitHandler=async (event)=>{
     event.preventDefault();
    const job=jobType.current.value;
    const location=locationType.current.value;
@@ -45,7 +45,7 @@ export default function JobForm() {
    }else if(skills.length===0){
     toast.error("Select atleast one skills");
    }else{
-    createJob(jobDataForm,skills,job,location,companyLogo.current.files[0],token);
+   await  createJob(jobDataForm,skills,job,location,companyLogo.current.files[0],token);
     locationType.current.selectedIndex=0 
     jobType.current.selectedIndex=0
     setSkills([]);
@@ -61,7 +61,6 @@ export default function JobForm() {
    }
    
   }
-  console.log(jobDataForm)
   return (
     <div className='w-[60vw] h-[100vh] flex items-center justify-center'>
      <form className='w-[80%] m-auto flex flex-col gap-2' onSubmit={onSubmitHandler}>

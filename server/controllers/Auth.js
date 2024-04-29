@@ -23,7 +23,6 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     // Find user by email
     const user = await User.findOne({ email });
-    console.log(user);
     // Handle case when user is not found
     if (!user) {
       return respondWithError(res, 401, 'User not registered. Please sign up.');
