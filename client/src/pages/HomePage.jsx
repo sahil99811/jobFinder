@@ -5,7 +5,6 @@ import JobCard from '../components/core/job/JobCard'
 import { useSelector } from 'react-redux'
 export default function HomePage() {
   const {jobs}=useSelector((state)=>state.job);
-  console.log(jobs)
   return (
          <div className='h-[100vh] w-[100vw] relative overflow-x-hidden'>
            <Navbar></Navbar>

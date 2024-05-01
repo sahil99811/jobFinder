@@ -5,12 +5,22 @@ import { getJobs } from '../../apis/job';
 import { useDispatch, useSelector } from 'react-redux';
 import { setJobs } from '../../slices/jobSlice';
 import { Link } from 'react-router-dom';
+
 export default function JobSearch() {
-  const dispatch=useDispatch();
+  // Function to fetch jobs based on search query
+const fetchJobs = async () => {
+  const data = await getJobs(search,skills);
+  dispatch(setJobs(data?.jobs));
+
+};
+
+
+const dispatch=useDispatch();
 // State variables
 const [skills, setSkills] = useState([]); // Array to store selected skills
 const [search, setSearch] = useState(""); // State to store search query
 const {token}=useSelector((state)=>state.auth);
+
 // Event handler for selecting skills from dropdown
 const skillsSelectHandler = (event) => {
    const {value}=event.target;
@@ -24,12 +34,12 @@ const skillsSelectHandler = (event) => {
 const removeSkillsHandler = (event) => {
   const newSkills = skills.filter((value) => value !== event.target.value);
   setSkills(newSkills);
+  fetchJobs();
 };
 
 // Function to apply filters
 const applyFilterHandler = async () => {
   fetchJobs();
-  
 };
 
 // Event handler for input change (search)
@@ -38,12 +48,10 @@ const onChangeHandler = (event) => {
   setSearch(value);
 };
 
-// Function to fetch jobs based on search query
-const fetchJobs = async () => {
-  const data = await getJobs(search,skills);
-  dispatch(setJobs(data?.jobs));
-
-};
+const clearSkillsHandler=(event)=>{
+  setSkills([]);
+  fetchJobs();
+}
 
 // useEffect hook to trigger job search after a delay when search query changes
 useEffect(() => {
@@ -53,6 +61,7 @@ useEffect(() => {
   return () => {
     clearTimeout(timerId);
   };
+
 }, [search]);
 
 
@@ -91,8 +100,8 @@ useEffect(() => {
           {
             token==null? <div className='flex gap-5 mr-4'>
             <button className='w-28 h-7 bg-red rounded-sm text-white font-medium text-1xl' onClick={applyFilterHandler}>Apply filter</button>
-            <button className='text-1xl text-red font-normal' onClick={() => setSkills([])}>Clear</button>
-            </div>:<div className='flex  mr-4'><Link to="/createjob"><button className='w-28 h-7 bg-red rounded-sm text-white font-medium text-1xl' >+ Add Job</button></Link></div>
+            <button className='text-1xl text-red font-normal' onClick={clearSkillsHandler}>Clear</button>
+            </div>:<div className='flex  mr-4'><Link to="/job/createJob"><button className='w-28 h-7 bg-red rounded-sm text-white font-medium text-1xl' >+ Add Job</button></Link></div>
           }
         </div>
       </div>

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getJobDetails } from '../../../apis/job'
 import { useSelector } from 'react-redux';
 export default function JobDetailsCard() {
+    const navigate=useNavigate();
     const {token}=useSelector((state)=>state.auth);
     const jobType={
         "WFH":'work from home',
@@ -14,9 +15,7 @@ export default function JobDetailsCard() {
    const [jobPoster,setJobPoster]=useState(false);
    const fetchJobDetails=async ()=>{
     const result=await getJobDetails(jobId);
-    console.log(result.data)
     setJobDetails(result?.data);
-    console.log(result?.jobPoster)
     setJobPoster(result?.jobPoster);
    }
    useEffect(()=>{
@@ -38,7 +37,22 @@ export default function JobDetailsCard() {
             <div className='flex flex-col gap-2'>
                 <div className='flex justify-between'>
                 <h2 className='text-3xl font-medium'>{jobDetails?.title}</h2>
-                {(token&&jobPoster)&&<button className='w-24 h-8 bg-red rounded-md text-white font-normal text-1xl'>Edit job</button>}
+                {token && jobPoster && (
+                                     <button
+                                       className='w-24 h-8 bg-red rounded-md text-white font-normal text-1xl'
+                                       onClick={() => {
+                                       navigate("/job/editJob", {
+                                       state: {
+                                       jobDetails: jobDetails,
+                                       edit: true
+                                      }
+                                     });
+                                     }}
+                                     >
+                                     Edit job
+                                    </button>
+                )}
+
                 </div>
                 <p className='text-red font-light text-base'>{jobDetails?.location} | India</p>
             </div>

@@ -9,6 +9,7 @@ import CreateJob from './pages/CreateJob';
 import PrivateRoute from './components/core/auth/PrivateRoute'
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
+import Editjob from './pages/Editjob';
 function App() {
 
   return (
@@ -18,10 +19,17 @@ function App() {
         <Route path='/login' element={<Login></Login>}/>
         <Route path='/signup' element={<Signup></Signup>}/>
         <Route path='/job/:jobId' element={<JobDetails></JobDetails>}/>
-        <Route path='/createjob'
+        <Route path='/job/createJob'
           element={
             <PrivateRoute>
               <CreateJob></CreateJob>
+            </PrivateRoute>
+          }
+        ></Route>
+        <Route path='/job/editJob'
+          element={
+            <PrivateRoute>
+              <Editjob></Editjob>
             </PrivateRoute>
           }
         ></Route>

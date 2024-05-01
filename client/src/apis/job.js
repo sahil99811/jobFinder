@@ -2,9 +2,8 @@ import axios from 'axios'
 import toast from 'react-hot-toast';
 
 
-export const createJob=async ({companyName,jobPosition,salary,location,jobDescription,aboutCompany},skills,jobType,locationType,logo,token)=>{
+export const createJob=async ({companyName,jobPosition,salary,location,jobDescription,aboutCompany,jobType,locationType,skills},logo,token)=>{
     const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/job/createJob`;
-   debugger;
     try{
     const formData = new FormData();
     formData.append('companyName', companyName);
@@ -17,7 +16,6 @@ export const createJob=async ({companyName,jobPosition,salary,location,jobDescri
     formData.append('jobType', jobType);
     formData.append('locationType', locationType);
     formData.append('logo', logo);
-    
     const response=await axios.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -30,21 +28,36 @@ export const createJob=async ({companyName,jobPosition,salary,location,jobDescri
     })
     if(response?.status===201){
       toast.success(response.data.message);
-    }else{
-      toast.error(response.data.message);
+      return true;
     }
+      toast.error(response.data.message);
+      return true;
     }catch(error){
        console.log(error);
        toast.error("Server Error try after sometime");
     }
 }
 
-export const updateJob=async ({companyName,logoUrl,jobPosition,jobType,mode,location,jobDescription,aboutCompany,skills,additionalInformation,salary})=>{
+export const updateJob=async ({companyName,jobPosition,salary,location,jobDescription,aboutCompany,jobType,locationType,skills},id,token)=>{
     try{
-        const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/auth/signup`;
-        await axios.put(url,{companyName,logoUrl,jobPosition,jobType,mode,location,jobDescription,aboutCompany,skills,additionalInformation,salary})
+        const url = `${process.env.REACT_APP_BACKEND_BASE_URL}/job/editjob/${id}`;
+        console.log("update job api is called");
+       const response= await axios.patch(url,{companyName,jobPosition,salary,location,jobDescription,aboutCompany,jobType,locationType,skills},{
+          Authorization: `Bearer ${token}`,
+          validateStatus: function (status) {
+            return status === 400 || status === 201||status===401||status===402||status===403;
+          }
+        })
+        if(response?.status===201){
+          toast.success(response.data.message);
+          return true;
+        }
+        toast.error(response.data.message);
+        return false;
     }catch(error){
-
+      console.log(error);
+       toast.error("Server Error try after sometime");
+  
     }
 }
 
@@ -63,6 +76,7 @@ export const getJobDetails=async (jobid)=>{
 
 export const getJobs=async (search,skills)=>{
     try{
+      console.log("get jobs called");
         let url = `${process.env.REACT_APP_BACKEND_BASE_URL}/job/getJobs`;
         if(search){
             url=url+`?search=${search}`;

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import {toast} from 'react-hot-toast'
 import {login} from '../../../apis/auth'
 import { Link, useNavigate } from 'react-router-dom'
 import {useDispatch} from 'react-redux';
@@ -23,7 +22,7 @@ export default function LoginForm() {
   }
   
   return (
-    <form className='flex flex-col gap-4' onSubmit={onSubmitHandler}>
+      <form className='flex flex-col gap-4' onSubmit={onSubmitHandler}>
       <input
         type='text'
         placeholder='Email'

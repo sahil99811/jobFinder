@@ -98,12 +98,6 @@ exports.getJobs = async (req, res) => {
     await fetchJobs(req, res, query);
 }
 
-exports.getJobPosterJobs = async (req, res) => {
-    const { id } = req.user;
-    const userId = new mongoose.Types.ObjectId(id);
-    const query = { jobPoster: userId };
-    await fetchJobs(req, res, query);
-}
 
 
 
@@ -129,27 +123,51 @@ exports.getJobDetails=async (req,res)=>{
 exports.editJob=async(req,res)=>{
     try{
        const {jobId}=req.params;
-       const {companyName,logoUrl,jobPosition,jobType,mode,location,jobDescription,aboutCompany,skills,additionalInformation,salary}=req.body;
+       const {companyName,
+        jobPosition,
+        jobDescription,
+        salary,
+        location,
+        locationType,
+        skills,
+        jobType,
+        aboutCompany}=req.body;
+        if (
+            !companyName ||
+            !jobPosition ||
+            !jobDescription ||
+            !salary ||
+            !location ||
+            !locationType ||
+            !skills ||
+            !jobType ||
+            !aboutCompany
+        ) {
+            return res.status(400).json({
+                success:false,
+                message: "all field required",
+            });
+        }
+        console.log(typeof skills,jobId);
        const job=await Job.findByIdAndUpdate({
         _id:jobId},{
-            companyName:companyName,
-            logoUrl:logoUrl,
-            jobPosition:jobPosition,
-            jobType:jobType,
-            mode:mode,
-            location:location,
-            jobDescription:jobDescription,
-            aboutCompany:aboutCompany,
+            companyName,
+            title:jobPosition ,
+            description:jobDescription,
+            salary,
+            location,
+            locationType,
             skills:skills,
-            additionalInformation:additionalInformation,
-            salary:salary,
-       },{new:true});
+            jobType,
+            aboutCompany,
+       });
+       
         if(!job){
             respondWithError(res, 401, 'Invalid jobId');
         }
-        return res.status(200).json({
+        return res.status(201).json({
             success:true,
-            data:job
+            message:'Job edit succesfully'
         })
     }catch(error){
         respondWithError(res, 500, 'something went wrong. Please try again.');
